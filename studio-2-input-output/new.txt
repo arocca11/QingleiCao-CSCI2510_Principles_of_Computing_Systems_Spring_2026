@@ -1,0 +1,2 @@
+What i am typing will go to new.txt and once i save it will overwrite the exisiting data in new.txt
+cat >> new.txt is simply adding this instead of overwriting what was in new.txt

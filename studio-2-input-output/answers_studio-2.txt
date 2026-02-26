@@ -1,0 +1,15 @@
+//Anthony Rocca
+//csci 2510 studio-2 answers
+//2/25/2026
+
+
+1) when you run cat with no argument thereafter it just defaults to reading from STDIN which is the keyboard input and then writes to STDOUT which is the monitor screen.
+2) cat < mars.txt will detach STDIN from the keyboard and attached it to mars.txt which will read the file and print its contents to the monitor screen (terminal)
+3) cat < mars.txt > new.txt will copy mars.txt into new.txt. The terminal will just go to a clean command line.
+4) cat > new.txt STDIN is the keyboard again (<) and STDOUT is directed to new.txt. Everything typed will be put in new.txt and will overwrite anything exisiting in new.txt
+5) cat >> new.txt appends whatever you add thereafter without deleting anything that was exisiting in new.txt. it will just add it to the bottom of the file.
+6) #include <unistd.h> is the header file which allows for read() and write() system calls via C standard library
+8) man 2 read shows ssize_t read(int fd, void *buf, size_t count); so the return value is ssize_t which allows for a positive number of bytes and a return value of 0 for end of file (EOF).
+9) reference copy.c
+10) if buffersize = 1 the program will still function however it will be very, very slow. functionality (and memory usage) will increase as you increase the buffersize
+11) buffersize=1 will use virtually no RAM; however if you try to pass a 10MB file you are going to go inside the kernel 10,000,000 times which will sink your CPU performance. if you set the buffersize to lets say 2048 you will go into the kernel far less and use more RAM. the tradeoff as the question asks is memory vs CPU, it is a balancing act where to get optimal performance you need to know your hardwares read and write block size.. if its 4kb that means having a buffersize=4096 is going to be most advantageous due to the fact that 4096 bytes will be fetched by the OS in a single physical disk operation, perfectly aligning the softwares system call with the hardwares natural data block to maximize throughput. 
