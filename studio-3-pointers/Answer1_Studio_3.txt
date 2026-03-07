@@ -1,0 +1,34 @@
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ls -al
+total 20
+drwxr-xr-x 2 arocca11 arocca11  4096 Mar  5 13:25 .
+drwxr-xr-x 8 arocca11 arocca11  4096 Mar  5 13:25 ..
+-rw-r--r-- 1 arocca11 arocca11 10753 Mar  5 13:25 README.md
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ls
+README.md
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ vim Exercise_1.c
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ls
+Exercise_1.c  README.md
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ls -l
+total 16
+-rw-r--r-- 1 arocca11 arocca11    55 Mar  5 13:31 Exercise_1.c
+-rw-r--r-- 1 arocca11 arocca11 10753 Mar  5 13:25 README.md
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ gcc Exercise_1.c -o Exercise_1
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ./Exercise_1
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ echo $?
+0
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat FileDoesNotExist
+cat: FileDoesNotExist: No such file or directory
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat Exercise_1.c
+#include <stdio.h>
+
+int main () {
+    return 0;
+    }
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat FileDoesNotExist
+cat: FileDoesNotExist: No such file or directory
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ echo $?
+1
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$
+

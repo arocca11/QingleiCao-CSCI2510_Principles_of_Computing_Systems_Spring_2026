@@ -1,0 +1,52 @@
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat Exercise_1.c
+#include <stdio.h>
+
+int main () {
+    char *messagePtr = "HELLOWORLD!";
+    printf("%s\n", messagePtr);
+    for (int i = 0; messagePtr[i] != '\0'; i++) {
+        printf("%c\n", messagePtr[i]);
+        }
+    printf("%c\n", *messagePtr);
+    printf("%c\n", *(messagePtr + 1));
+    printf("%c\n", *(messagePtr + 2));
+    printf("%c\n", *(messagePtr + 3));
+    for (int i = 0; *(messagePtr + i) != '\0'; i++) {
+        printf("%c\n", *(messagePtr + i));
+        }
+    return 0;
+    }
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ gcc Exercise_1.c -o exe_7
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ./ exe_7
+-bash: ./: Is a directory
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ./exe_7
+HELLOWORLD!
+H
+E
+L
+L
+O
+W
+O
+R
+L
+D
+!
+H
+E
+L
+L
+H
+E
+L
+L
+O
+W
+O
+R
+L
+D
+!
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$
+

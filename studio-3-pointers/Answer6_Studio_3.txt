@@ -1,0 +1,34 @@
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat Exercise_1.c
+#include <stdio.h>
+
+int main () {
+    char *messagePtr = "HELLOWORLD!";
+    printf("%s\n", messagePtr);
+    for (int i = 0; messagePtr[i] != '\0'; i++) {
+        printf("%c\n", messagePtr[i]);
+        }
+    printf("%c\n", *messagePtr);
+    printf("%c\n", *(messagePtr + 1));
+    printf("%c\n", *(messagePtr + 2));
+    printf("%c\n", *(messagePtr + 3));
+    return 0;
+    }
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ./exe_6
+HELLOWORLD!
+H
+E
+L
+L
+O
+W
+O
+R
+L
+D
+!
+H
+E
+L
+L
+

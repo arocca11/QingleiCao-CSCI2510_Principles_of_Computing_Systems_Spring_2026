@@ -1,0 +1,26 @@
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ vim Answer2_Studio_3.txt
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat Exercise_1.c
+#include <stdio.h>
+
+int main () {
+    char *messagePtr = "HELLOWORLD!";
+    printf("%s\n", messagePtr);
+    return 0;
+    }
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ vim Answer2_Studio_3.txt
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ vim Answer2_Studio_3.txt
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ cat Exercise_1.c
+#include <stdio.h>
+
+int main () {
+    char *messagePtr = "HELLOWORLD!";
+    printf("%s\n", messagePtr);
+    return 0;
+    }
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ gcc Exercise_1.c -o exe_1
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$ ./exe_1
+HELLOWORLD!
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-3-pointers$
+
