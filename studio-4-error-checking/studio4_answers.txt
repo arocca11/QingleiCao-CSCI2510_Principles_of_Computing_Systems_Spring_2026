@@ -1,0 +1,80 @@
+1)
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+
+#define bufferSize 4096
+
+int main(int argc, char *argv[]) {
+    //checks for correct number of command line arguments which is 2
+    if (argc != 2) {
+        fprintf(stderr, "use %s <filename>\n", argv[0]);
+        exit(-1);
+    }
+
+    //opens the file instead of relaying on STDIN
+    int fd = open(argv[1], O_RDONLY);
+
+    if (fd == -1) {
+        perror("error opening file");
+        exit(-1);
+    }
+
+    char buffer[bufferSize];
+    ssize_t bytes_read;
+
+    while (1) {
+        bytes_read = read(fd, buffer, bufferSize);
+
+        if (bytes_read == 0) {
+            break;
+        }
+
+        if (bytes_read == -1) {
+            perror("error reading file");
+            close(fd);
+            exit(-1);
+        }
+
+        write(STDOUT_FILENO, buffer, bytes_read);
+    }
+    close(fd);
+    return 0;
+}
+
+2) What happens when arguments specify a file that doesn't exist?
+
+if the file doesn't exist, open() silently fails and returns -1. -1 is passed to the field descriptor into the read(). read() will fail and the program exits silently without printing anything to the terminal. 
+
+3) the exact same things happen when you execute the command chmod -rw perm.txt. when i execute the program on this file- the exact same thing happens because i lack read permissions, open fails and returns -1 the -1 is passed to read() which also fails.
+
+4) What value does open() return in the event of an error?
+
+-1
+
+5) the conditional checked is if (fd == -1)
+
+6) perror("error opening file");
+
+8) now, what happens when the argument to your program specifies a file that doesn't exist?
+
+The program catches the -1 return value, exits before read, and prints the system generated error message.
+
+9) what happens when the argument specifies the file without read or write permissions- perm.txt?
+
+The program catches the error and prints error opening file: permission denied
+
+10)Look at the following manual pages and determine hat values are returned in the even of an error, and whether these functions set errno:
+
+man 2 open: returns -1. sets errno.
+man 2 close: returns -1. sets errno.
+man 2 read: returns -1. sets errno.
+man 2 write: returns -1. sets errno.
+man 3 printf: returns a negative value. sets errno (indicates an underlying write error).
+
+11)Give two reasons why error checking in this manner simplifies software development.
+
+error checking is important for many reasons, one being preventing compounding failures. if you catch an error early it will not effect other logic and variables being build on a bug. and another reason is error checking points to the main cause of an error, typically. This, again, reduces the likelihood of cascading failures.
+
+
