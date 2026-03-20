@@ -1,0 +1,85 @@
+Anthony Rocca
+
+2) Works well: RLE works great for something like the SLU logo imagine included in the lab file. The logo is a massive, uninterrupted block of a single solid color. RLE handles this with ease and efficiency.
+Works poorly: if a file wre comprised of data constantly changing and never repeating. If you try to compress thta with length of 1 you will wind up with an output file that is twice the size. For example, A B C D, if you compress that it will be 1A 1B 1C 1D... and thus twice the size
+
+3) 1mil_strong_bias will compress the best. Most of the numbers are 0 a thus the probability of getting several chains of straight 0's is very high, which means RLE is the best method to handle such a file. when i execute the following i get:
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$ ./rle 1mil_random comp_random 1 0
+./rle 1mil_weak_bias comp_weak 1 0
+./rle 1mil_strong_bias comp_strong 1 0
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$ wc -c comp_random comp_weak comp_strong
+1598828 comp_random
+ 851464 comp_weak
+ 409084 comp_strong
+2859376 total
+
+and thus; the following ratios are 0.62, 1.17 and 2.44 respectively. therefore, my original hypothesis was correct, 1mil_strong_bias will compress the best.
+
+4 & 5) arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$ time ./rle test4 output1 1 0
+time ./rle test4 output10 10 0
+
+real    0m20.986s
+user    0m1.888s
+sys     0m19.651s
+
+real    0m2.325s
+user    0m0.199s
+sys     0m1.972s
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$
+
+this data shows that the program went from taking nearly 21 seconds to 2.3 seconds. 21 seconds in real time to run with a compression length of 1. 2.3 seconds with a compression length of 10. why the difference? because the system calls like read() and write() are processing 1 byte at a time for output1 and for output10 they are processing 10 bytes at a time; thus making the execution of output10 ten times faster. This is due to the context switch that we talking about in class on 3/19/2026. This is indicated in the sys times for each instance, one is 19.651 the other is 1.9. This accounts for all the kernel administration that occurs when executing output1.
+
+6)
+3%:
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$ ls -l
+total 53544
+-rw-r--r-- 1 arocca11 arocca11  1000000 Feb 25 17:45 1mil_random
+-rw-r--r-- 1 arocca11 arocca11  1000000 Feb 25 17:45 1mil_strong_bias
+-rw-r--r-- 1 arocca11 arocca11  1000000 Feb 25 17:45 1mil_weak_bias
+-rw-r--r-- 1 arocca11 arocca11    14204 Feb 25 17:45 README.md
+-rw------- 1 arocca11 arocca11   133552 Mar 19 19:38 comp_logo.bin
+-rw------- 1 arocca11 arocca11  1598828 Mar 19 19:19 comp_random
+-rw------- 1 arocca11 arocca11   409084 Mar 19 19:19 comp_strong
+-rw------- 1 arocca11 arocca11   851464 Mar 19 19:19 comp_weak
+-rw------- 1 arocca11 arocca11  1598828 Mar 19 19:18 compressed
+-rw------- 1 arocca11 arocca11  4937534 Mar 19 19:38 decomp_logo.bmp
+-rw------- 1 arocca11 arocca11       41 Mar 19 18:04 decompressed
+-rw-r--r-- 1 arocca11 arocca11      754 Mar 19 19:24 lab1_answers.txt
+-rw------- 1 arocca11 arocca11  6280644 Mar 19 19:27 output1
+-rw------- 1 arocca11 arocca11  3538912 Mar 19 19:27 output10
+-rwxr-xr-x 1 arocca11 arocca11    20416 Mar 19 16:38 rle
+-rw-r--r-- 1 arocca11 arocca11     3786 Mar 19 16:37 rle.c
+-rw-r--r-- 1 arocca11 arocca11  4937534 Feb 25 17:45 slu_logo.bmp
+-rw-r--r-- 1 arocca11 arocca11   295308 Mar 19 19:56 slu_logo.jpg
+-rw-r--r-- 1 arocca11 arocca11   123181 Mar 19 19:56 slu_logo.png
+-rw-r--r-- 1 arocca11 arocca11       41 Feb 25 17:45 test1
+-rw-r--r-- 1 arocca11 arocca11       33 Feb 25 17:45 test2
+-rw-r--r-- 1 arocca11 arocca11      301 Feb 25 17:45 test3
+-rw-r--r-- 1 arocca11 arocca11  3217782 Feb 25 17:45 test4
+-rw-r--r-- 1 arocca11 arocca11 24883254 Feb 25 17:45 uncompressed.bmp
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$
+
+The size for each type of image for the slu_logo is detailed in the above list. the compression ratios (original / compressed size) are as follows: 4937534/133552 = 36.97 for RLE, 4937534/123181 = 40.08 for PNG, and 4937534/295308 = 16.72 for JPG. 
+
+2%:
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$ wc -c uncompressed.bmp comp_uncompressed.bin
+24883254 uncompressed.bmp
+48099632 comp_uncompressed.bin
+72982886 total
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$
+-rw-r--r-- 1 arocca11 arocca11  3217782 Feb 25 17:45 test4
+-rw-r--r-- 1 arocca11 arocca11 24883254 Feb 25 17:45 uncompressed.bmp
+-rw-r--r-- 1 arocca11 arocca11   947534 Mar 19 20:08 uncompressed.jpg
+-rw-r--r-- 1 arocca11 arocca11  9622215 Mar 19 20:08 uncompressed.png
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/lab-1-run-length-compression$
+RLE Ratio: 24,883,254 / 48,099,632 = 0.52 * PNG (Lossless) Ratio: 24,883,254 / 9,622,215 = 2.59
+
+JPG (Lossy) Ratio: 24,883,254 / 947,534 = 26.26
+
+The photograph is a complex scene. every single pixel is slightly different color than the one next to it. Because there are no long runs of identical data the run length encoding algorithm was forced to write a 1 byte counter and a 1 byte patter for almost every single pixel, which physically doubled the size of the file. All the while the JPG algorithm kills it with a 26x compression ratio because it is a lossy format. it uses more advanced math to group similar pixels together and throw away the tiny color differences the human eye will not see.
+
+All three look relatively the same.. if you zoom in closely on the JPG you will see a tiny bit of blurry blocks around the edges; however, at normal size its the same.
+
+
+
