@@ -1,0 +1,427 @@
+//Anthony Rocca Studio-5 exercise answers and code
+1)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    //get the pid
+    printf("my PID is: %d\n", getpid());
+    return 0;
+}
+
+arocca11@acor94:~$ cnew fork.c
+arocca11@acor94:~$ cd QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026$ cd studio-5-fork-exec/
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ cnew fork.c
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ gcc fork.c -o fork
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork
+my PID is: 1554
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork
+my PID is: 1556
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork
+my PID is: 1557
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ vim studio-5_answers.txt
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$
+
+2)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    //fork() then get the pid
+    fork();
+    printf("my PID is: %d\n", getpid());
+    return 0;
+}
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork_a
+my PID is: 1580
+my PID is: 1581
+
+3) 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    //fork() then get the pid
+    pid_t a = fork();
+    printf("fork() returns: %d\n and my PID is: %d\n", a, getpid());
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork_b
+fork() returns: 463
+ and my PID is: 462
+fork() returns: 0
+ and my PID is: 463
+as the manual states the parent PID, 462, ran the code. fork() returned 463. The OS is telling the parent, i cloned you and your new child is PID 463. Then 463 ran its code and returned 0. This is because the child is a clone and does not yet have its own children to return.
+
+4)
+void exercise_234() {
+    printf("\n=== Exercise 2,3,4 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d and the child PID is %d\n", getpid(), child_pid);
+        wait(NULL);
+    }
+    else {
+        printf("Fork failed\n");
+    }
+}
+
+int main() {
+    exercise_1();
+    exercise_234();
+    return 0;
+}
+I decided to write these in separate functions and call them in the main. this satisfies exercises 1 through 4. having said that, the child gets 0 so we can send it to the if and then the parent to the else if for the outputs stipulated in exercise 4.
+
+5)
+This exercise asks me to employ the sleep() function. Why is this so important? because if a parent finishes a process prior to a child that child can become what is referred to as an orphan process. This may or may not have a negative impact on your overall program. so the best practice is to simply sleep() which ever process has the smaller workload and then wake it up when the process with the heavier workload is complete. see my example below:
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ cat forkchild PID: 721.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+void exercise_1() {
+    printf("\n=== Exercise 1 ===\n");
+    printf("My PID is: %d\n", getpid());
+}
+
+void exercise_234() {
+    printf("\n=== Exercise 2,3,4 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d and the child PID is %d\n", getpid(), child_pid);
+        wait(NULL);
+    }
+    else {
+        printf("Fork failed\n");
+    }
+}
+
+void exercise_5() {
+    printf("\n=== exercise 5 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        sleep(5);
+        printf("child PID: %d", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d, and child PID: %d\n", getpid(), child_pid);
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+
+
+int main() {
+    exercise_1();
+    exercise_234();
+    exercise_5();
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork_all
+
+=== Exercise 1 ===
+My PID is: 723
+
+=== Exercise 2,3,4 ===
+parent PID: 723 and the child PID is 724
+child PID: 724
+
+=== exercise 5 ===
+parent PID: 723, and child PID: 725
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ child PID: 725
+
+this last line with child PID: 725 shows how the sleep function works. the parent process printed its line and immediately hit return 0 at the bottom of main. because the parent died, the OS assumed the program was totally finished and gave me back the home directory in the terminal prompt. When the child process woke up it became an orphan process and executed its printf and shoved its output directly onto the screen
+
+6)
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ cat fork.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+void exercise_1() {
+    printf("\n=== Exercise 1 ===\n");
+    printf("My PID is: %d\n", getpid());
+}
+
+void exercise_234() {
+    printf("\n=== Exercise 2,3,4 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d and the child PID is %d\n", getpid(), child_pid);
+        wait(NULL);
+    }
+    else {
+        printf("Fork failed\n");
+    }
+}
+
+void exercise_5() {
+    printf("\n=== exercise 5 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        //sleep(5);
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d, and child PID: %d\n", getpid(), child_pid);
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+void exercise_6() {
+    printf("\n=== exercise 6 waitpid ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        sleep(3);
+        printf("child pid: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent pid: %d.. waiting on child %d\n", getpid(), child_pid);
+        waitpid(child_pid, NULL, 0);
+        printf("child is finished parent now exiting\n");
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+
+
+int main() {
+    exercise_1();
+    sleep(2);
+    exercise_234();
+    sleep(2);
+    exercise_5();
+    sleep(2);
+    exercise_6();
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork_all
+
+=== Exercise 1 ===
+My PID is: 804
+
+=== Exercise 2,3,4 ===
+parent PID: 804 and the child PID is 805
+child PID: 805
+
+=== exercise 5 ===
+parent PID: 804, and child PID: 806
+child PID: 806
+
+=== exercise 6 waitpid ===
+parent pid: 804.. waiting on child 807
+child pid: 807
+child is finished parent now exiting
+
+exercise 6() is modified with the waitpid() call. waitpid() asks the OS kernel to referee the process(s). The parent process sleeps until the child process calls exit(0). at which time the OS wakes up the parent. its a rather clever way in which the user can direct the OS to referee multiple processes.
+
+7 & 8)
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ cat fork.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+void exercise_1() {
+    printf("\n=== Exercise 1 ===\n");
+    printf("My PID is: %d\n", getpid());
+}
+
+void exercise_234() {
+    printf("\n=== Exercise 2,3,4 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d and the child PID is %d\n", getpid(), child_pid);
+        wait(NULL);
+    }
+    else {
+        printf("Fork failed\n");
+    }
+}
+
+void exercise_5() {
+    printf("\n=== exercise 5 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        //sleep(5);
+        printf("child PID: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d, and child PID: %d\n", getpid(), child_pid);
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+void exercise_6() {
+    printf("\n=== exercise 6 waitpid ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        sleep(3);
+        printf("child pid: %d\n", getpid());
+        exit(0);
+    }
+    else if (child_pid > 0) {
+        printf("parent pid: %d.. waiting on child %d\n", getpid(), child_pid);
+        waitpid(child_pid, NULL, 0);
+        printf("child is finished parent now exiting\n");
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+void exercise_78() {
+    printf("\n=== exercise 7 and 8 ===\n");
+    pid_t child_pid = fork();
+
+    if (child_pid == 0) {
+        printf("child PID: %d will containt 'ls -l'..\n", getpid());
+
+        char* child_argv[] = {"ls", "-l", NULL};
+        char* child_prog = child_argv[0];
+
+        execvp(child_prog, child_argv);
+        printf("execvp failed\n");
+        exit(1);
+    }
+    else if (child_pid > 0) {
+        printf("parent PID: %d .. waiting on child to run ls .. \n\n", getpid());
+        waitpid(child_pid, NULL, 0);
+        printf("\nparent: the ls command is complete.. now exiting\n");
+    }
+    else {
+        printf("fork failed\n");
+    }
+}
+
+
+
+
+
+
+int main() {
+    exercise_1();
+    sleep(2);
+    exercise_234();
+    sleep(2);
+    exercise_5();
+    sleep(2);
+    exercise_6();
+    sleep(2);
+    exercise_78();
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$ ./fork_all
+
+=== Exercise 1 ===
+My PID is: 837
+
+=== Exercise 2,3,4 ===
+parent PID: 837 and the child PID is 838
+child PID: 838
+
+=== exercise 5 ===
+parent PID: 837, and child PID: 839
+child PID: 839
+
+=== exercise 6 waitpid ===
+parent pid: 837.. waiting on child 840
+child pid: 840
+child is finished parent now exiting
+
+=== exercise 7 and 8 ===
+parent PID: 837 .. waiting on child to run ls ..
+
+child PID: 841 will containt 'ls -l'..
+total 84
+-rw-r--r-- 1 arocca11 arocca11  5946 Mar 26 13:00 README.md
+-rwxr-xr-x 1 arocca11 arocca11 16008 Mar 26 14:11 fork
+-rw-r--r-- 1 arocca11 arocca11  2333 Mar 26 19:38 fork.c
+-rwxr-xr-x 1 arocca11 arocca11 16048 Mar 26 14:16 fork_a
+-rwxr-xr-x 1 arocca11 arocca11 16528 Mar 26 19:38 fork_all
+-rwxr-xr-x 1 arocca11 arocca11 16048 Mar 26 16:43 fork_b
+-rw-r--r-- 1 arocca11 arocca11  1803 Mar 26 14:17 studio-5_answers.txt
+
+parent: the ls command is complete.. now exiting
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-5-fork-exec$
+
+
+
+
+
+
