@@ -1,0 +1,164 @@
+//Anthony Rocca studio-6
+1)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char buffer[1024];
+    printf("Enter a string to parse: ");
+    if (fgets(buffer, 1024, stdin) != NULL) {
+        printf("You entered: %s\n", buffer);
+    }
+    return 0;
+}
+
+2)
+The difference between the initial call to strtok() and subsequent calls is that the first call get the string and the subsequent calls get NULL to pick up where it left off. So the first call serches from the beginning of buffer, finds the first word, marks the end of the word with \0 and remembers that spot in memory and hands back the first word. The subsequent calls just get NULL which tell strtok() to look at the \0 bookmark and pick up exactly where we left off. it will then find the second word, move /0 and hand it back.
+
+3)
+" " is the delimiter
+
+4)
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char buffer[1024];
+    printf("Enter a string to parse: ");
+    if (fgets(buffer, 1024, stdin) != NULL) {
+        printf("you entered: %s\n", buffer);
+        char* first_token = strtok(buffer, " ");
+        printf("exercise 4 first token: %s\n", first_token);
+    }
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-6-input-parsing-with-strtok$ ./parse_ex4
+Enter a string to parse: hello world
+you entered: hello world
+
+exercise 4 first token: hello
+it clearly put the \0 after hello as intended.
+
+5)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char buffer[1024];
+    printf("Enter a string to parse: ");
+    if (fgets(buffer, 1024, stdin) != NULL) {
+        printf("you entered: %s\n", buffer);
+        char* token = strtok(buffer, " ");
+        printf("exercise 4 first token: %s\n", token);
+
+        while (token != NULL) {
+            printf("%s\n", token);
+            token = strtok(NULL, " ");
+        }
+    }
+    return 0;
+}
+by including a while loop you iterate to each \0 and print each token on a new line, exhaustively.
+
+output: 6/studio-6-input-parsing-with-strtok$ ./parse_ex5
+Enter a string to parse: hello world
+you entered: hello world
+
+exercise 4 first token: hello
+hello
+world
+
+6)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char buffer[1024];
+    printf("Enter a string to parse: ");
+    if (fgets(buffer, 1024, stdin) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+        printf("you entered: %s\n", buffer);
+        char* token = strtok(buffer, " ");
+        printf("exercise 4 first token: %s\n", token);
+
+        while (token != NULL) {
+            printf("%s\n", token);
+            token = strtok(NULL, " ");
+        }
+    }
+    return 0;
+}
+output is: 6/studio-6-input-parsing-with-strtok$ ./parse_ex6
+Enter a string to parse: hello world
+you entered: hello world
+exercise 4 first token: hello
+hello
+world
+buffer[strcspn(buffer, "\n")] = '\0'; got rid of the line breaks at the end of the tokens
+
+7 & 8 & 9)
+
+6/studio-6-input-parsing-with-strtok$ cat parse.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char buffer[1024];
+    int max_args = 15;
+    int max_argv_size = max_args + 2;
+    char* cmd;
+    char* my_argv[max_argv_size];
+    printf("Enter a command to execute: ");
+    if (fgets(buffer, 1024, stdin) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+        cmd = strtok(buffer, " ");
+        my_argv[0] = cmd;
+        int i = 1;
+        char* res = strtok(NULL, " ");
+        while (res != NULL) {
+            my_argv[i] = res;
+            i++;
+            res = strtok(NULL, " ");
+        }
+        my_argv[i] = NULL;
+        execvp(cmd, my_argv);
+        printf("execvp failed. command not found");
+        //printf("you entered: %s\n", buffer);
+        //char* token = strtok(buffer, " ");
+        //printf("exercise 4 first token: %s\n", token);
+
+        //while (token != NULL) {
+            //printf("%s\n", token);
+            //token = strtok(NULL, " ");
+        //}
+    }
+    return 0;
+}
+
