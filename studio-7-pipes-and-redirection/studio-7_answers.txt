@@ -1,0 +1,253 @@
+1)
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ cat program1.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    printf("Hello from program1\n");
+    return 0;
+}
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ ./program1
+Hello from program1
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ cat program2.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    char input[1024];
+    while (fgets(input, 1024, stdin) != NULL) {
+        printf("program 2 received: %s", input);
+    }
+    return 0;
+}
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ ./program2
+
+program 2 received:
+hello
+program 2 received: hello
+you are still running?
+program 2 received: you are still running?
+
+2)
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ gcc pipe.c -o pipe
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ ./pipe
+parent: spawning...
+
+Hello from program1
+hello
+program 2 received: hello
+goodybye
+program 2 received: goodybye
+^C
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ cat pipe.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    printf("parent: spawning...\n\n");
+
+    pid_t child1_pid = fork();
+    if (child1_pid == 0) {
+        char* cmd1 = "./program1";
+        char* argv1[] = {"program1", NULL};
+        execvp(cmd1, argv1);
+        perror("error exe program1");
+        exit(1);
+    }
+
+    pid_t child2_pid = fork();
+    if (child2_pid == 0) {
+        char* cmd2 = "./program2";
+        char* argv2[] = {"program2", NULL};
+        execvp(cmd2, argv2);
+        perror("error exe program2");
+        exit(1);
+    }
+
+    waitpid(child1_pid, NULL, 0);
+    waitpid(child2_pid, NULL, 0);
+    printf("\nparent: both children done. exiting.\n");
+    return 0;
+}
+
+3)
+
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ cat pipe.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    printf("parent: spawning...\n\n");
+    //this is the pipe
+    int fd[2];
+    if (pipe(fd) == -1) {
+        perror("Pipe failed");
+        exit(1);
+    }
+
+    pid_t child1_pid = fork();
+    if (child1_pid == 0) {
+        char* cmd1 = "./program1";
+        char* argv1[] = {"program1", NULL};
+        execvp(cmd1, argv1);
+        perror("error exe program1");
+        exit(1);
+    }
+
+    pid_t child2_pid = fork();
+    if (child2_pid == 0) {
+        char* cmd2 = "./program2";
+        char* argv2[] = {"program2", NULL};
+        execvp(cmd2, argv2);
+        perror("error exe program2");
+        exit(1);
+    }
+
+    waitpid(child1_pid, NULL, 0);
+    waitpid(child2_pid, NULL, 0);
+    printf("\nparent: both children done. exiting.\n");
+    return 0;
+}
+
+4)
+dup2() works by telling the OS to take the existing file descriptor(newfd) and completely overwrite it with a cop of this other one(oldfd). So in program1 I'm going to use dup2(fd[1], stdout_fileno); which will close the connection to the screen and replace it with the write end of the pipe. as for program2 ill use dup2(fd[0], stdin_fileno) which will close the connection to the keyboard and replace it with the read end of the pipe.
+
+5)
+dup2(fd[1], STDOUT_FILENO); // In Child 1
+dup2(fd[0], STDIN_FILENO);  // In Child 2
+
+6) 
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ cat pipe.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    printf("parent: spawning...\n\n");
+
+    int fd[2];
+    if (pipe(fd) == -1) {
+        perror("Pipe failed");
+        exit(1);
+    }
+
+    pid_t child1_pid = fork();
+    if (child1_pid == 0) {
+        dup2(fd[1], STDOUT_FILENO);
+        char* cmd1 = "./program1";
+        char* argv1[] = {"program1", NULL};
+        execvp(cmd1, argv1);
+        perror("error exe program1");
+        exit(1);
+    }
+
+    pid_t child2_pid = fork();
+    if (child2_pid == 0) {
+        dup2(fd[0], STDIN_FILENO);
+        char* cmd2 = "./program2";
+        char* argv2[] = {"program2", NULL};
+        execvp(cmd2, argv2);
+        perror("error exe program2");
+        exit(1);
+    }
+
+    waitpid(child1_pid, NULL, 0);
+    waitpid(child2_pid, NULL, 0);
+    printf("\nparent: both children done. exiting.\n");
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ ./pipe
+parent: spawning...
+
+program 2 received: Hello from program1
+^C
+
+7)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    printf("parent: spawning...\n\n");
+
+    int fd[2];
+    if (pipe(fd) == -1) {
+        perror("Pipe failed");
+        exit(1);
+    }
+
+    pid_t child1_pid = fork();
+    if (child1_pid == 0) {
+        dup2(fd[1], STDOUT_FILENO);
+        close(fd[0]);
+        char* cmd1 = "./program1";
+        char* argv1[] = {"program1", NULL};
+        execvp(cmd1, argv1);
+        perror("error exe program1");
+        exit(1);
+    }
+
+    pid_t child2_pid = fork();
+    if (child2_pid == 0) {
+        dup2(fd[0], STDIN_FILENO);
+        close(fd[1]);
+        char* cmd2 = "./program2";
+        char* argv2[] = {"program2", NULL};
+        execvp(cmd2, argv2);
+        perror("error exe program2");
+        exit(1);
+    }
+    close(fd[0]);
+    close(fd[1]);
+
+    waitpid(child1_pid, NULL, 0);
+    waitpid(child2_pid, NULL, 0);
+    printf("\nparent: both children done. exiting.\n");
+    return 0;
+}
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-7-pipes-and-redirection$ ./pipe
+parent: spawning...
+
+program 2 received: Hello from program1
+
+parent: both children done. exiting.
+
+8)
+the advantages I see with this stream ambiguity are 1) its modular by nature and 2) it is relatively simple to pipe two programs together using dup2() pipe() and fork()
