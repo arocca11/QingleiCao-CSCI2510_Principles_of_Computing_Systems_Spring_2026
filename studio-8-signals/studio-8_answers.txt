@@ -1,0 +1,52 @@
+//anthony rocca studio-8 answers
+
+1) 
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-8-signals$ gcc sleep.c -o sleep
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-8-signals$ ./sleep
+Sleeper's PID is: 464
+Slept for 0 iterations!
+Slept for 1 iterations!
+Slept for 2 iterations!
+Slept for 3 iterations!
+Slept for 4 iterations!
+Slept for 5 iterations!
+Slept for 6 iterations!
+^C
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-8-signals$
+
+2) 
+The numeric value for SIGINT is 2
+The associated is "interrupt from keyboard"
+
+3)
+The sleeper process terminated as if i had used ctrl+C
+
+4)
+kill -s 9 <pid> is the unblockable kill signal.. I used that one and it terminated the program immediately
+
+kill -s 19 <pid> this one paused the program. thus maintaining the memory space and it can be resumed by kill -s 18 <pid> 
+
+5)
+ctrl+c terminates both the parent and the child. the caller was started from my terminal which then launched sleep.c. so there is a parent-child relationship. when the parent is terminated so is the child and thus the parent never output the finished waiting message.
+
+6)
+void sigint_handler(int signum) {
+    printf("\nCaller: Caught signal %d (SIGINT), but I'm ignoring it!\n", signum);
+
+//inside the main
+signal(SIGINT, sigint_handler);
+
+7)
+arocca11@acor94:~/QingleiCao-CSCI2510_Principles_of_Computing_Systems_Spring_2026/studio-8-signals$ ./call_sleeper
+Forking sleeper...
+Waiting for sleeper 1370...
+Sleeper's PID is: 1370
+Slept for 0 iterations!
+Slept for 1 iterations!
+Slept for 2 iterations!
+^C
+Caller: Caught signal 2 (SIGINT), but I'm ignoring it!
+Parent finished waiting and returned successfully!
+
+8)
+signals are ideal for event handling. I use them in macros I write for a game I play. specifically; identifying text as it is parsed and then acting on said text. While this is at the OS level it is similar from a logic stance. At the OS level you can handle hardware disconnects, timers, and larms with them..

@@ -3,12 +3,21 @@
 #include <unistd.h> //fork(), execvp(), perror(), waidpid() 
 #include <stdlib.h> //For exit()
 #include <stdio.h> //For printf()
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
+
+void sigint_handler(int signum) {
+	printf("\nCaller: Caught signal %d (SIGINT), but I'm ignoring it!\n", signum);
+}
 
 int main( int argc, char* argv[] ){
 
 	pid_t ret;
 
 	printf("Forking sleeper...\n");	
+
+	signal(SIGINT, sigint_handler);
 
 	ret = fork();
 	if( ret == -1 ){
@@ -31,7 +40,7 @@ int main( int argc, char* argv[] ){
 
 	//Parent
 	printf("Waiting for sleeper %d...\n", ret);
-	waitpid( ret, NULL, 0 );
+	waitpid(ret, NULL, 0);
 
 	printf("Parent finished waiting and returned successfully!\n");
 
