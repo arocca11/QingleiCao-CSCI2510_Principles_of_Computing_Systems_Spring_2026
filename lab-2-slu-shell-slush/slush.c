@@ -63,13 +63,35 @@ void execute_pipeline(char* segments [], int index, int total_segments) {
 
 int main() {
     char buffer[MAX_LINE];
+    //call the signal handler to ignore SIGINT (Ctrl+C) so that the shell doesn't exit when the user presses it
     signal(SIGINT, sigint_handler);
     //keep the shell going with an infinite loop
     while (1) {
-        //print the prompt immediately
-        printf("slush> ");
+        //print the prompt (extra credit: show the current working directory in the prompt)
+        char cwd[1024];
+        char *home = getenv("HOME");
+        if (getcwd(cwd, sizeof(cwd)) != NULL && home != NULL) {
+            int home_len = strlen(home);
+            
+            //check current path starts with the HOME path
+            if (strncmp(cwd, home, home_len) == 0) {
+                if (cwd[home_len] == '\0') {
+                    //in home directory
+                    printf("slush|>");
+                } else if (cwd[home_len] == '/') {
+                    //in a subdirectory of home, show the path relative to home
+                    printf("slush|%s> ", cwd + home_len + 1);
+                }
+            } else {
+                //outside of home directory, show the full path
+                printf("slush|%s> ", cwd);
+            }
+        } else {
+            // Fallback prompt just in case getcwd() fails
+            printf("slush> ");
+        }
         fflush(stdout);
-        
+
         //read the user input from stdin if the user hits Ctrl+D (EOF), fgets will return NULL, so we can check for that to exit gracefully
         if (fgets(buffer, MAX_LINE, stdin) == NULL) {
             printf("\n");
